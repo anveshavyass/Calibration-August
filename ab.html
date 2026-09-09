@@ -97,25 +97,6 @@
   }
   @media (prefers-reduced-motion:reduce){ .month-recap{animation:none;} }
 
-  .top-title{
-    position:fixed;
-    left:0; right:0; top:70px;
-    z-index:10;
-    text-align:center;
-    pointer-events:none;
-    font-family:"Playfair Display","IBM Plex Sans",serif;
-    font-weight:600;
-    font-size:clamp(28px, 4vw, 46px);
-    letter-spacing:.005em;
-    color:#FFE9C7;
-    text-shadow:
-      0 0 10px rgba(242,166,73,.65),
-      0 0 24px rgba(242,166,73,.4),
-      0 0 46px rgba(242,166,73,.22);
-    animation:glow-pulse 5s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion:reduce){ .top-title{animation:none;} }
-
   /* ================= CROSS-SECTION STRIP ================= */
   .stage{
     position:relative;
@@ -601,8 +582,6 @@
   .udemy-chart .chart-note{margin:10px 0 0;font-family:var(--font-mono);font-size:11px;color:var(--ink-dim);line-height:1.5;}
 
 </style>
-
-<div class="top-title">AEGIS: The Agent Security Gateway</div>
 
 <div class="stars" id="stars">
   <span class="comet" style="--cx:6vw; --cy:8vh; --ctx:34vw; --cty:20vh; --cangle:24deg; --cdur:11s; --cdelay:-1s;"></span>
