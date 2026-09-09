@@ -478,6 +478,8 @@
 
   .constellation-wrap[hidden]{display:none;}
   .constellation-wrap{max-width:900px;margin:0 auto;}
+  #constellation-p4{max-width:none;}
+  #constellation-p4 .constellation-stage{height:78vh;}
   .constellation-intro{max-width:60ch;margin:0 auto 8px;text-align:center;}
   .constellation-intro .lede{
     max-width:none;text-align:center;
@@ -647,27 +649,29 @@
         <div class="constellation-stage">
           <div class="filler-stars" id="fillerStars"></div>
           <svg class="constellation-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <line x1="8" y1="82" x2="18" y2="58"></line>
-            <line x1="18" y1="58" x2="28" y2="68"></line>
-            <line x1="28" y1="68" x2="42" y2="38"></line>
-            <line x1="42" y1="38" x2="56" y2="46"></line>
-            <line x1="56" y1="46" x2="70" y2="20"></line>
-            <line x1="70" y1="20" x2="86" y2="12"></line>
-            <line x1="70" y1="20" x2="84" y2="36"></line>
+            <line x1="4" y1="88" x2="25" y2="45"></line>
+            <line x1="25" y1="45" x2="42" y2="12"></line>
+            <line x1="42" y1="12" x2="54" y2="45"></line>
+            <line x1="54" y1="45" x2="75" y2="26"></line>
+            <line x1="75" y1="26" x2="92" y2="44"></line>
           </svg>
-          <span class="con-dim-star" style="left:8%; top:82%;"></span>
-          <span class="con-dim-star" style="left:18%; top:58%;"></span>
-          <span class="con-dim-star" style="left:42%; top:38%;"></span>
-          <span class="con-dim-star" style="left:70%; top:20%;"></span>
-          <span class="con-dim-star" style="left:84%; top:36%;"></span>
-          <button class="con-star" style="left:28%; top:68%;" data-star="proxy">
-            <span class="dot"></span><span class="lbl">Proxy Benchmark Harness</span>
+          <button class="con-star" style="left:4%; top:88%;" data-star="toolreg">
+            <span class="dot"></span><span class="lbl">Tool Registry</span>
           </button>
-          <button class="con-star" style="left:56%; top:46%;" data-star="opa">
-            <span class="dot"></span><span class="lbl">OPA Input/Output Schema</span>
+          <button class="con-star" style="left:25%; top:45%;" data-star="agentreg">
+            <span class="dot"></span><span class="lbl">Agent Registry</span>
           </button>
-          <button class="con-star" style="left:86%; top:12%;" data-star="soak">
-            <span class="dot"></span><span class="lbl">Soak Benchmark CI Test</span>
+          <button class="con-star" style="left:42%; top:12%;" data-star="dbdecision">
+            <span class="dot"></span><span class="lbl">Database Decision</span>
+          </button>
+          <button class="con-star" style="left:54%; top:45%;" data-star="proxy">
+            <span class="dot"></span><span class="lbl">Testing</span>
+          </button>
+          <button class="con-star" style="left:75%; top:26%;" data-star="opa">
+            <span class="dot"></span><span class="lbl">IP/OP Schema</span>
+          </button>
+          <button class="con-star" style="left:92%; top:44%;" data-star="soak">
+            <span class="dot"></span><span class="lbl">CI Test</span>
           </button>
         </div>
       </div>
@@ -676,7 +680,7 @@
         <button class="star-back" data-back>&#9668; CONSTELLATION</button>
         <div class="content-panel" style="--stat-color:var(--p1); --tag-color:var(--p1);">
           <div>
-            <p class="proj-title">Proxy Benchmark Harness</p>
+            <p class="proj-title">Testing</p>
             <p class="lede">Proves the gateway's enforcement actually works &mdash; real attack traffic, replayed through the real policy engine, scored automatically instead of checked by eye. One single command, <code>run_bench.sh</code>, boots the whole system and tests it end to end.</p>
           </div>
 
@@ -714,7 +718,7 @@
         <button class="star-back" data-back>&#9668; CONSTELLATION</button>
         <div class="content-panel" style="--stat-color:var(--p3); --tag-color:var(--p3);">
           <div>
-            <p class="proj-title">OPA Input/Output Schema</p>
+            <p class="proj-title">IP/OP Schema</p>
             <p class="lede">The frozen wire contract between the gateway and the policy engine &mdash; and the tests that keep it from drifting.</p>
           </div>
 
@@ -775,7 +779,7 @@
         <button class="star-back" data-back>&#9668; CONSTELLATION</button>
         <div class="content-panel" style="--stat-color:var(--p2); --tag-color:var(--p2);">
           <div>
-            <p class="proj-title">Soak Benchmark CI Test</p>
+            <p class="proj-title">CI Test</p>
             <p class="lede">A dedicated CI job that keeps the policy engine under sustained load and fails the build if latency drifts.</p>
           </div>
           <div class="stat-row">
@@ -825,6 +829,36 @@
               <li>Kept apart from unit_test.yaml, because its <code>-race</code> flag distorts latency.</li>
               <li>Distinct from TestReloadUnderConcurrentLoad, which checks correctness, not speed.</li>
             </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="star-panel" id="star-toolreg" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p5); --tag-color:var(--p5);">
+          <div>
+            <p class="proj-title">Tool Registry</p>
+            <p class="lede">Details coming soon.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="star-panel" id="star-agentreg" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p6); --tag-color:var(--p6);">
+          <div>
+            <p class="proj-title">Agent Registry</p>
+            <p class="lede">Details coming soon.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="star-panel" id="star-dbdecision" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p7); --tag-color:var(--p7);">
+          <div>
+            <p class="proj-title">Database Decision</p>
+            <p class="lede">Details coming soon.</p>
           </div>
         </div>
       </div>
