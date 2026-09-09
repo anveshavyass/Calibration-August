@@ -684,7 +684,7 @@
             <p class="lede">Proves the gateway's enforcement actually works &mdash; real attack traffic, replayed through the real policy engine, scored automatically instead of checked by eye. One single command, <code>run_bench.sh</code>, boots the whole system and tests it end to end.</p>
           </div>
 
-          <img src="flow-diagram.png" alt="Flow diagram: run_bench.sh boots OPA and mock_proxy.py. harness.py loads a case, replays its setup, and sends the test as a RequestEvent to the proxy. The proxy checks for an injection phrase, reads the session's taint labels, and asks OPA (policy.rego plus data.json) for allow/deny. OPA's result determines FORWARD or SAFE_FALLBACK, returned as a Decision JSON. The harness compares that against the case's label, tallies it into one of four outcome buckets, and repeats until the file is exhausted, feeding a pass/fail scoreboard." style="width:100%;height:auto;border-radius:8px;border:1px solid var(--line);margin-top:4px;">
+          <img src="flowchart_anvesha.png" alt="Flow diagram: run_bench.sh boots OPA and mock_proxy.py. harness.py loads a case, replays its setup, and sends the test as a RequestEvent to the proxy. The proxy checks for an injection phrase, reads the session's taint labels, and asks OPA (policy.rego plus data.json) for allow/deny. OPA's result determines FORWARD or SAFE_FALLBACK, returned as a Decision JSON. The harness compares that against the case's label, tallies it into one of four outcome buckets, and repeats until the file is exhausted, feeding a pass/fail scoreboard." style="width:100%;height:auto;border-radius:8px;border:1px solid var(--line);margin-top:4px;">
 
           <div>
             <p class="skills-label">How it works</p>
