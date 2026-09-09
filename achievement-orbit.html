@@ -480,6 +480,9 @@
   .constellation-wrap{max-width:900px;margin:0 auto;}
   #constellation-p4{max-width:none;}
   #constellation-p4 .constellation-stage{height:78vh;}
+  #constellation-p8{max-width:none;}
+  #constellation-p8 .constellation-stage{height:72vh;}
+  #constellation-p8 .constellation-intro{margin-bottom:18px;}
   .constellation-intro{max-width:60ch;margin:0 auto 8px;text-align:center;}
   .constellation-intro .lede{
     max-width:none;text-align:center;
@@ -1040,6 +1043,249 @@
 
     </div>
 
+    <div class="constellation-wrap" id="constellation-p8" hidden>
+
+      <div class="constellation-intro">
+        <p class="lede">The gateway decides whether an agent action is allowed &mdash; but a decision is only as trustworthy as its inputs. This is the layer <i>before</i> any policy runs: <b>the gateway for the gateway.</b> Four gates that turn a raw, untrusted request into a uniform, trustworthy decision input &mdash; who is calling, on whose authority, what has happened so far, and one clean shape for everything downstream.</p>
+      </div>
+
+      <div class="constellation-view" id="conView8">
+        <div class="constellation-stage">
+          <div class="filler-stars"></div>
+          <svg class="constellation-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <line x1="6" y1="78" x2="26" y2="40"></line>
+            <line x1="26" y1="40" x2="50" y2="70"></line>
+            <line x1="50" y1="70" x2="72" y2="34"></line>
+            <line x1="72" y1="34" x2="92" y2="62"></line>
+          </svg>
+          <button class="con-star" style="left:6%; top:78%;" data-star="identity">
+            <span class="dot"></span><span class="lbl">Identification</span>
+          </button>
+          <button class="con-star" style="left:26%; top:40%;" data-star="authz">
+            <span class="dot"></span><span class="lbl">Authorization</span>
+          </button>
+          <button class="con-star" style="left:50%; top:70%;" data-star="session">
+            <span class="dot"></span><span class="lbl">Session</span>
+          </button>
+          <button class="con-star" style="left:72%; top:34%;" data-star="adapters">
+            <span class="dot"></span><span class="lbl">Adapters</span>
+          </button>
+          <button class="con-star" style="left:92%; top:62%;" data-star="learnings">
+            <span class="dot"></span><span class="lbl">The Gateway for the Gateway</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="star-panel" id="star-identity" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p8); --tag-color:var(--p8);">
+          <div>
+            <p class="skills-label">Step 1 &middot; who is calling</p>
+            <p class="proj-title">Identification</p>
+            <p class="lede">Every decision the gateway makes reasons about <i>which agent is calling</i>. If that identity can be forged, every check built on top of it is meaningless. This first gate derives a <b>cryptographically proven</b> identity from the TLS handshake itself &mdash; not from anything the caller writes into the request.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Why it must exist</p>
+            <ul class="proj-list">
+              <li>Identity is the root of trust: authorization, session ownership, and provenance all reason about &ldquo;this agent&rdquo; &mdash; a spoofable identity poisons all of them at once.</li>
+              <li>A caller-supplied identifier &mdash; a header, an id in the body &mdash; can be copied or replayed. A handshake-proven identity cannot be presented by anyone who doesn't hold the private key.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">How the cryptography works</p>
+            <div style="margin-top:6px;">
+              <div class="status-row"><span class="status-num">00</span><div class="status-body"><h4>Asymmetric keys</h4><p>Each workload holds a private key and a matching public key. Anything signed by the private key verifies against the public one &mdash; but the private key never leaves the workload.</p></div></div>
+              <div class="status-row"><span class="status-num">01</span><div class="status-body"><h4>X.509 certificate</h4><p>The public key wrapped with an identity and signed by a trusted authority. It asserts: this authority vouches that this key belongs to this identity.</p></div></div>
+              <div class="status-row"><span class="status-num">02</span><div class="status-body"><h4>Trust bundle</h4><p>The set of authorities we're willing to believe. A certificate only counts if it chains back to one of them &mdash; this is what makes an identity impossible to self-declare.</p></div></div>
+              <div class="status-row"><span class="status-num">03</span><div class="status-body"><h4>mTLS handshake</h4><p><b>Mutual</b> TLS: both sides present certificates and each proves it holds the matching private key. The gateway ends the handshake already knowing, cryptographically, who it is talking to.</p></div></div>
+              <div class="status-row"><span class="status-num">04</span><div class="status-body"><h4>SVID + URI SAN</h4><p>The agent's certificate is a <b>SPIFFE SVID</b> &mdash; short-lived, auto-rotated, carrying a SPIFFE ID such as <code>spiffe://aegis/agent-banking</code> in its URI SAN field. That ID <i>is</i> the agent's verified name.</p></div></div>
+            </div>
+          </div>
+
+          <div class="callout-box" style="--tag-color:var(--p8);">
+            <p><b>Identity is a fact derived from cryptography, never a header the caller sets.</b> The gateway extracts it from a completed handshake; the request body has no say in it.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">What I learned</p>
+            <div class="skill-tags">
+              <span class="skill-tag" style="--tag-color:var(--p8);">Public-key cryptography</span>
+              <span class="skill-tag" style="--tag-color:var(--p8);">X.509 / PKI</span>
+              <span class="skill-tag" style="--tag-color:var(--p8);">Mutual TLS</span>
+              <span class="skill-tag" style="--tag-color:var(--p8);">SPIFFE / SPIRE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="star-panel" id="star-authz" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p4); --tag-color:var(--p4);">
+          <div>
+            <p class="skills-label">Step 2 &middot; on whose authority</p>
+            <p class="proj-title">Authorization</p>
+            <p class="lede">Identification tells us <i>who the agent is</i>. Authorization establishes <i>on whose authority it acts</i> and <i>what that authority permits</i>. An agent almost always acts for a human principal &mdash; this gate is what stops it exceeding the rights of the person it represents.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Why it must exist</p>
+            <ul class="proj-list">
+              <li>Closes the <b>confused-deputy</b> gap: a powerful agent must not be tricked into spending its own broad access on behalf of a user who doesn't have it.</li>
+              <li>Enables <b>per-user least privilege</b> &mdash; the same agent is allowed different things depending on which human it is currently acting for.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">The two questions it answers</p>
+            <div style="margin-top:6px;">
+              <div class="status-row"><span class="status-num">00</span><div class="status-body"><h4>RBAC &mdash; what may this identity do</h4><p>The agent's verified identity maps to a role, and the role maps to a set of allowed capabilities. A call outside that set is denied before it ever runs.</p></div></div>
+              <div class="status-row"><span class="status-num">01</span><div class="status-body"><h4>OBO &mdash; for which human, in what scope</h4><p>The request carries a delegated token proving a specific user authorized this agent to act for them. The gateway verifies it and reads the scopes it grants.</p></div></div>
+            </div>
+          </div>
+
+          <div>
+            <p class="skills-label">On-behalf-of, precisely</p>
+            <p class="lede">This follows OAuth 2.0 token exchange (RFC 8693): the user's authority is delegated to the agent as a signed token, and the gateway verifies its signature against a cached key set &mdash; <b>no live call to an identity provider on the hot path</b>. The token names the subject (the human) and the scopes they delegated.</p>
+          </div>
+
+          <div class="callout-box" style="--tag-color:var(--p4);">
+            <p><b>Identification = who. Authorization = for whom, and what they're allowed.</b> Both are verified facts by the time policy runs &mdash; the decision engine never sees a raw token or certificate, only the identity and scopes proven here.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">What I learned</p>
+            <div class="skill-tags">
+              <span class="skill-tag" style="--tag-color:var(--p4);">RBAC</span>
+              <span class="skill-tag" style="--tag-color:var(--p4);">OAuth 2.0 On-Behalf-Of</span>
+              <span class="skill-tag" style="--tag-color:var(--p4);">Token exchange (RFC 8693)</span>
+              <span class="skill-tag" style="--tag-color:var(--p4);">JWT / JWKS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="star-panel" id="star-session" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p2); --tag-color:var(--p2);">
+          <div>
+            <p class="skills-label">Step 3 &middot; what has happened so far</p>
+            <p class="proj-title">Session</p>
+            <p class="lede">Statefulness is what makes cross-step enforcement possible. A single request judged alone can look harmless &mdash; the danger lives in the <i>sequence</i>. The session is the <b>server-side memory</b> that carries what has happened so far, so a later action can be judged against everything the agent has already touched.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Startup &mdash; opening a session</p>
+            <p class="lede">The first request of a task arrives with no <code>session_id</code>. The gateway mints one &mdash; high-entropy, server-issued &mdash; and opens a session record bound to <i>(agent identity + user principal)</i>. The caller doesn't choose the id, and can't claim someone else's.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Maintenance &mdash; context propagation</p>
+            <ul class="proj-list">
+              <li>Every later request presents that <code>session_id</code>; the gateway <b>binds</b> it to the same server-side record after checking the presenter still owns it.</li>
+              <li>Accumulated <b>provenance and history labels</b> travel forward with the session &mdash; this is the exact state taint and egress policy read to catch a leak that only becomes dangerous across steps.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">Termination &mdash; closing cleanly</p>
+            <p class="lede">A natural end-of-control-flow flag closes the session into a terminal state, so accumulated taint can't bleed into the agent's next, unrelated task. Ending is deliberate &mdash; not a side effect of a dropped connection.</p>
+          </div>
+
+          <div class="callout-box" style="--tag-color:var(--p2);">
+            <p>The client carries the session <b>handle</b> (the id); the server owns the <b>state</b> (the labels and provenance). The thing being guarded must never own the state used to guard it &mdash; which is exactly why this state is server-authoritative, not trusted from the caller.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Three lifetimes, never conflated</p>
+            <div style="margin-top:6px;">
+              <div class="status-row"><span class="status-num">00</span><div class="status-body"><h4>The mTLS connection</h4><p>A single network link. Opens and closes far more often than a task lasts.</p></div></div>
+              <div class="status-row"><span class="status-num">01</span><div class="status-body"><h4>The SVID</h4><p>The agent's identity certificate. Rotates on its own short schedule &mdash; the agent is the same agent across rotations.</p></div></div>
+              <div class="status-row"><span class="status-num">02</span><div class="status-body"><h4>The session</h4><p>One unit of work. Spans many connections and several SVID rotations &mdash; and is the only one of the three that carries accumulated security state.</p></div></div>
+            </div>
+          </div>
+
+          <div>
+            <p class="skills-label">What I learned</p>
+            <div class="skill-tags">
+              <span class="skill-tag" style="--tag-color:var(--p2);">Session lifecycle</span>
+              <span class="skill-tag" style="--tag-color:var(--p2);">Server-authoritative state</span>
+              <span class="skill-tag" style="--tag-color:var(--p2);">Context propagation</span>
+              <span class="skill-tag" style="--tag-color:var(--p2);">Connection vs. identity vs. session</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="star-panel" id="star-adapters" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p9); --tag-color:var(--p9);">
+          <div>
+            <p class="skills-label">Step 4 &middot; one shape for everything downstream</p>
+            <p class="proj-title">Adapters</p>
+            <p class="lede">By the time a request reaches policy, it must look identical no matter where it came from &mdash; an LLM provider call, an MCP tool, a peer agent. Adapters are the layer that takes any raw request body and extracts its fields into <b>one canonical decision schema</b> that flows through the whole gateway.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Why it must exist</p>
+            <ul class="proj-list">
+              <li><b>One contract, many front doors.</b> The enforcement core is written once against a single shape; a new transport means a new adapter, not a change to the engine.</li>
+              <li>It decouples <i>what a request means</i> from <i>how it arrived</i> &mdash; the policy engine never has to know a request was OpenAI-shaped or MCP-shaped.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">What it produces</p>
+            <p class="lede">The adapter normalizes each request into the decision input &mdash; identity, action (tool, args, sink, capability), and the session's trust state &mdash; the same frozen internal contract every consumer downstream is built against. Extract the required fields once, at the edge, and everything after speaks one language.</p>
+          </div>
+
+          <div class="callout-box" style="--tag-color:var(--p9);">
+            <p><b>Normalize once at the edge, so nothing downstream ever has to know where a request came from.</b></p>
+          </div>
+
+          <div>
+            <p class="skills-label">What I learned</p>
+            <div class="skill-tags">
+              <span class="skill-tag" style="--tag-color:var(--p9);">Adapter pattern</span>
+              <span class="skill-tag" style="--tag-color:var(--p9);">Canonicalization</span>
+              <span class="skill-tag" style="--tag-color:var(--p9);">Contract-first design</span>
+              <span class="skill-tag" style="--tag-color:var(--p9);">Transport-agnostic interfaces</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="star-panel" id="star-learnings" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p3); --tag-color:var(--p3);">
+          <div>
+            <p class="skills-label">The through-line</p>
+            <p class="proj-title">The Gateway for the Gateway</p>
+            <p class="lede">These four gates are the ingress layer &mdash; the setup half of the request lifecycle, before any policy runs. Everything above them (authorization rules, taint, egress) consumes what they produce. A decision is only ever as trustworthy as the input this layer hands it.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Why building the <i>first</i> step was bottom-up</p>
+            <p class="lede">Coding the starting step isn't top-down &mdash; you can't stub what everything else stands on. To standardize the contract at the base, I had to map the whole architecture and data flow end to end first, then freeze the shape everything above would build against.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">What the base taught me</p>
+            <ul class="proj-list">
+              <li><b>Standardize from the start.</b> Freeze the contract at the bottom; change it later and every consumer breaks at once.</li>
+              <li><b>Trust-boundary thinking.</b> Inputs are verified or derived, never claimed &mdash; identity from a handshake, labels from the gateway, state from the server.</li>
+              <li><b>Separate the lifetimes.</b> Connection, identity, and session each change on their own clock and must not be conflated.</li>
+              <li><b>Fail closed.</b> The absence of a proven fact is treated as untrusted, not waved through.</li>
+            </ul>
+          </div>
+
+          <p class="signoff">who &rarr; on whose authority &rarr; what's happened so far &rarr; one clean shape &mdash; then policy decides.</p>
+        </div>
+      </div>
+
+    </div>
+
     <div class="content-panel" id="content-p7" hidden style="--stat-color:var(--p7); --tag-color:var(--p7);">
       <div>
         <p class="skills-label">Status report &mdash; AI Security Gateway</p>
@@ -1349,7 +1595,7 @@
       p7:'Aegis', p8:"Jishnu's Contribution", p9:'Next Stages'
     };
     var COLORS = {p4:'var(--p4)',p5:'var(--p5)',p6:'var(--p6)',p7:'var(--p7)',p8:'var(--p8)',p9:'var(--p9)'};
-    var CONTENT_IDS = {p7:'content-p7', p4:'constellation-p4', p9:'content-p9'};
+    var CONTENT_IDS = {p7:'content-p7', p8:'constellation-p8', p4:'constellation-p4', p5:'content-p5', p6:'content-p6', p9:'content-p9'};
     var current = 0;
 
     var detail = document.getElementById('detail');
@@ -1382,46 +1628,51 @@
       var contentId = CONTENT_IDS[m];
       if (contentId){
         pendingPanel.hidden = true;
-        document.getElementById(contentId).hidden = false;
+        var panel = document.getElementById(contentId);
+        panel.hidden = false;
+        if (panel.classList.contains('constellation-wrap') && panel._reset){ panel._reset(); }
       } else {
         pendingPanel.hidden = false;
       }
-      if (m === 'p4'){ resetConstellation(); }
     }
 
-    var conView = document.getElementById('conView');
-    var starPanels = Array.prototype.slice.call(document.querySelectorAll('.star-panel'));
-    function resetConstellation(){
-      conView.hidden = false;
-      starPanels.forEach(function(sp){ sp.hidden = true; });
-    }
-    function openStar(name){
-      conView.hidden = true;
-      starPanels.forEach(function(sp){
-        var match = sp.id === 'star-' + name;
-        sp.hidden = !match;
-        if (match){ sp.querySelector('.content-panel').hidden = false; }
+    document.querySelectorAll('.constellation-wrap').forEach(function(wrap){
+      var view = wrap.querySelector('.constellation-view');
+      var panels = Array.prototype.slice.call(wrap.querySelectorAll('.star-panel'));
+      function reset(){
+        view.hidden = false;
+        panels.forEach(function(sp){ sp.hidden = true; });
+      }
+      function openStar(name){
+        view.hidden = true;
+        panels.forEach(function(sp){
+          var match = sp.id === 'star-' + name;
+          sp.hidden = !match;
+          if (match){ sp.querySelector('.content-panel').hidden = false; }
+        });
+      }
+      wrap._reset = reset;
+      wrap.querySelectorAll('.con-star').forEach(function(s){
+        s.addEventListener('click', function(){ openStar(s.getAttribute('data-star')); });
       });
-    }
-    document.querySelectorAll('.con-star').forEach(function(s){
-      s.addEventListener('click', function(){ openStar(s.getAttribute('data-star')); });
-    });
-    document.querySelectorAll('[data-back]').forEach(function(b){
-      b.addEventListener('click', resetConstellation);
+      wrap.querySelectorAll('[data-back]').forEach(function(b){
+        b.addEventListener('click', reset);
+      });
     });
 
-    var fillerEl = document.getElementById('fillerStars');
-    var fillerFrag = document.createDocumentFragment();
-    for (var fi = 0; fi < 70; fi++){
-      var fs = document.createElement('i');
-      fs.style.top = (Math.random() * 100) + '%';
-      fs.style.left = (Math.random() * 100) + '%';
-      var fbig = Math.random() < 0.12;
-      if (fbig){ fs.style.width = '3px'; fs.style.height = '3px'; }
-      fs.style.opacity = (0.15 + Math.random() * 0.5).toFixed(2);
-      fillerFrag.appendChild(fs);
-    }
-    fillerEl.appendChild(fillerFrag);
+    document.querySelectorAll('.filler-stars').forEach(function(fillerEl){
+      var fillerFrag = document.createDocumentFragment();
+      for (var fi = 0; fi < 70; fi++){
+        var fs = document.createElement('i');
+        fs.style.top = (Math.random() * 100) + '%';
+        fs.style.left = (Math.random() * 100) + '%';
+        var fbig = Math.random() < 0.12;
+        if (fbig){ fs.style.width = '3px'; fs.style.height = '3px'; }
+        fs.style.opacity = (0.15 + Math.random() * 0.5).toFixed(2);
+        fillerFrag.appendChild(fs);
+      }
+      fillerEl.appendChild(fillerFrag);
+    });
     function open(idx){ current = idx; render(); detail.hidden = false; document.getElementById('backBtn').focus(); }
     function close(){ detail.hidden = true; }
     function step(delta){ current = (current + delta + MODULES.length) % MODULES.length; render(); }
@@ -1440,7 +1691,7 @@
         else if (e.key === 'ArrowLeft'){ step(-1); }
       } else {
         var n = parseInt(e.key, 10);
-        if (n >= 1 && n <= 5){ open(n - 1); }
+        if (n >= 1 && n <= MODULES.length){ open(n - 1); }
       }
     });
 
