@@ -1415,138 +1415,6 @@
       </div>
     </div>
 
-    <div class="content-panel" id="content-p5" hidden style="--stat-color:var(--p5); --tag-color:var(--p5);">
-      <div>
-        <p class="proj-title">SmartDoc &mdash; Document Q&amp;A Assistant</p>
-        <p class="lede">Turn a library of PDF documents into a grounded, cited Q&amp;A assistant &mdash; ask in plain English, get answers sourced back to the exact file, page, and paragraph.</p>
-      </div>
-
-      <div class="skill-tags">
-        <span class="skill-tag">Backend</span>
-        <span class="skill-tag">Frontend</span>
-        <span class="skill-tag">Vector DB</span>
-        <span class="skill-tag">History</span>
-        <span class="skill-tag">LLM</span>
-        <span class="skill-tag">Tests</span>
-      </div>
-
-      <div>
-        <p class="skills-label">Why it exists</p>
-        <p class="lede">Hand-searching PDF policies and manuals is slow, and pasting a whole document into a chatbot invites the model to guess when the document doesn't actually cover the question. SmartDoc retrieves only the passages relevant to a question, forces the LLM to answer from those passages alone, and cites exactly where each answer came from.</p>
-      </div>
-
-      <div>
-        <p class="skills-label">What it does</p>
-        <ul class="proj-list">
-          <li>Ingests PDFs &mdash; chunks, embeds, and stores them in a vector database.</li>
-          <li>Retrieves only the top-5 relevant chunks per question.</li>
-          <li>Says "not covered" instead of guessing when nothing's relevant.</li>
-          <li>Answers only from retrieved excerpts, with a cited source.</li>
-          <li>Remembers conversations &mdash; reopen or delete anytime.</li>
-        </ul>
-      </div>
-
-      <div>
-        <p class="skills-label">Tech stack</p>
-        <div class="table-wrap">
-          <table class="proj-table">
-            <thead><tr><th>Layer</th><th>Choice</th><th>Why</th></tr></thead>
-            <tbody>
-              <tr><td>LLM</td><td>GPT-4o-mini</td><td>Cheap &amp; fast</td></tr>
-              <tr><td>Embeddings</td><td>text-embedding-3-small</td><td>Cheap, same vendor</td></tr>
-              <tr><td>Vector store</td><td>ChromaDB</td><td>No server needed</td></tr>
-              <tr><td>History</td><td>SQLite</td><td>Simple, no ORM</td></tr>
-              <tr><td>Backend</td><td>FastAPI</td><td>Async &amp; typed</td></tr>
-              <tr><td>Frontend</td><td>Streamlit</td><td>No separate build</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div>
-        <p class="skills-label">Core concepts</p>
-        <ul class="proj-list">
-          <li><b>Chunking</b> &mdash; split into small overlapping pieces so each embedding stays focused.</li>
-          <li><b>Embeddings</b> &mdash; text turned into vectors; similar meaning sits close together.</li>
-          <li><b>Retrieval</b> &mdash; top-5 closest chunks pulled by similarity.</li>
-          <li><b>Relevance gate</b> &mdash; skips the LLM entirely if nothing's actually relevant.</li>
-          <li><b>Grounded answering</b> &mdash; the LLM never answers beyond what was retrieved.</li>
-          <li><b>Citation margin</b> &mdash; only chunks near the best match get cited.</li>
-          <li><b>Follow-up resolution</b> &mdash; rewrites context-dependent questions before retrieval.</li>
-        </ul>
-      </div>
-
-      <div>
-        <p class="skills-label">Testing</p>
-        <ul class="proj-list">
-          <li><b>Source</b> &mdash; 5 synthetic PDFs for a fictional company ("Clearwave Technologies"), generated (not hand-written) so the facts inside are consistent and known in advance &mdash; good material for demoing citations and testing retrieval.</li>
-          <li><b>Documents</b> &mdash; 2 HR policies, a product manual, an onboarding guide, and an SOP, covering exactly the document types this project targets. Regenerate or edit them anytime.</li>
-        </ul>
-        <div class="callout-box" style="--tag-color:var(--p5); margin-top:14px;">
-          <p>Also tested against 3 real internal documents &mdash; Calfus policies pulled from GreytHR &mdash; which ingested cleanly and answered questions as expected, confirming the pipeline works beyond the synthetic sample set.</p>
-        </div>
-      </div>
-
-      <div>
-        <p class="skills-label">Novelty features</p>
-        <ul class="proj-list">
-          <li><b>Multi-document scoping</b> &mdash; ask across all docs, one, or several; multi-doc scope answers independently per document instead of pooling chunks into one search.</li>
-          <li><b>Conversational follow-ups</b> &mdash; recent chat history resolves context-dependent questions before retrieval even runs.</li>
-          <li><b>Two hallucination guards</b> &mdash; a similarity threshold blocks the LLM call outright, and the LLM itself flags insufficient context after reading.</li>
-          <li><b>Paragraph-level citation</b> &mdash; file, page, and paragraph, with the exact supporting sentence highlighted inside the excerpt.</li>
-          <li><b>Summarization as its own intent</b> &mdash; whole-document summary requests are detected and routed separately from cited Q&amp;A.</li>
-          <li><b>Persistent multi-conversation history</b> &mdash; full session CRUD backed by SQLite, surviving restarts.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="content-panel" id="content-p6" hidden style="--stat-color:var(--p6); --tag-color:var(--p6);">
-      <div class="stat-row">
-        <div class="stat-card"><div class="num">31h 5m</div><div class="cap">Total watched, Jul&ndash;Sep 2026</div></div>
-        <div class="stat-card"><div class="num">Top 5</div><div class="cap">Learner &middot; August 2026</div></div>
-        <div class="stat-card"><div class="num">3&ndash;4</div><div class="cap">Courses completed</div></div>
-      </div>
-      <p class="lede">Completed more than 30 hours of coursework on Udemy this month, landing in the top 5 learners for August. The focus stayed practical &mdash; tools and models going straight into current work, not just certificates.</p>
-      <div>
-        <p class="skills-label">What was covered</p>
-        <ul class="proj-list">
-          <li>LLMs</li>
-          <li>FastAPI</li>
-          <li>Golang</li>
-          <li>GenAI</li>
-          <li>GitHub</li>
-          <li>Other Assigned Courses</li>
-        </ul>
-      </div>
-      <div>
-        <p class="skills-label">Activity trend</p>
-        <div class="udemy-chart">
-          <svg viewBox="0 0 340 180" role="img" aria-label="Time invested per month on Udemy: 0 minutes in July 2026, about 1,500 minutes in August 2026, and about 365 minutes so far in September 2026, a month still in progress.">
-            <title>Udemy time invested by month</title>
-            <line class="grid-line" x1="30" y1="140" x2="320" y2="140"></line>
-            <line class="grid-line" x1="30" y1="100" x2="320" y2="100"></line>
-            <line class="grid-line" x1="30" y1="60" x2="320" y2="60"></line>
-            <line class="grid-line" x1="30" y1="20" x2="320" y2="20"></line>
-            <text class="axis-label" x="26" y="143" text-anchor="end">0</text>
-            <text class="axis-label" x="26" y="103" text-anchor="end">500</text>
-            <text class="axis-label" x="26" y="63" text-anchor="end">1000</text>
-            <text class="axis-label" x="26" y="23" text-anchor="end">1500</text>
-            <polyline class="trend-line" points="70,140 195,20 320,111"></polyline>
-            <circle class="trend-dot" cx="70" cy="140" r="5"><title>July 2026: 0 min</title></circle>
-            <circle class="trend-dot" cx="195" cy="20" r="5"><title>August 2026: about 1,500 min</title></circle>
-            <circle class="trend-dot" cx="320" cy="111" r="5"><title>September 2026 (so far): about 365 min</title></circle>
-            <text class="value-label" x="70" y="130" text-anchor="middle">0 min</text>
-            <text class="value-label" x="195" y="12" text-anchor="middle">~1,500 min</text>
-            <text class="value-label" x="320" y="101" text-anchor="end">~365 min</text>
-            <text class="axis-label" x="70" y="163" text-anchor="middle">Jul 2026</text>
-            <text class="axis-label" x="195" y="163" text-anchor="middle">Aug 2026</text>
-            <text class="axis-label" x="320" y="163" text-anchor="end">Sep 2026</text>
-          </svg>
-          <p class="chart-note">Time invested per month, read from the Udemy dashboard. September is partial &mdash; the month just started.</p>
-        </div>
-      </div>
-    </div>
-
     <div class="content-panel" id="content-p9" hidden style="--stat-color:var(--p9); --tag-color:var(--p9);">
       <div>
         <p class="skills-label">Next stage</p>
@@ -1595,7 +1463,7 @@
       p7:'Aegis', p8:"Jishnu's Contribution", p9:'Next Stages'
     };
     var COLORS = {p4:'var(--p4)',p5:'var(--p5)',p6:'var(--p6)',p7:'var(--p7)',p8:'var(--p8)',p9:'var(--p9)'};
-    var CONTENT_IDS = {p7:'content-p7', p8:'constellation-p8', p4:'constellation-p4', p5:'content-p5', p6:'content-p6', p9:'content-p9'};
+    var CONTENT_IDS = {p7:'content-p7', p8:'constellation-p8', p4:'constellation-p4', p9:'content-p9'};
     var current = 0;
 
     var detail = document.getElementById('detail');
