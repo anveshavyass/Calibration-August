@@ -641,13 +641,9 @@
       <p><b id="pendingName">Jishnu's Contribution</b><br>Details coming soon.</p>
     </div>
 
-    <div class="constellation-wrap" id="constellation-p8" hidden>
+    <div class="constellation-wrap" id="constellation-p4" hidden>
 
       <div class="constellation-view" id="conView">
-        <div class="constellation-intro">
-          <p class="skills-label" style="text-align:center;">Aegis</p>
-          <p class="lede">Three proven pieces of the AI Security Gateway's enforcement work.</p>
-        </div>
         <div class="constellation-stage">
           <div class="filler-stars" id="fillerStars"></div>
           <svg class="constellation-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -896,42 +892,6 @@
           </div>
         </div>
       </div>
-
-      <div>
-        <p class="skills-label">Next stage</p>
-        <div style="margin-top:10px;">
-          <div class="stage-item">
-            <p class="why">Foundation &mdash; everything below depends on this</p>
-            <h4>Wire cmd/gateway for real</h4>
-            <p>The actual entrypoint still just logs a line and exits. It needs a persistent identity, a real signed-bundle story, and a listener that stays up across restarts.</p>
-          </div>
-          <div class="stage-item">
-            <p class="why">Unblocks a second, independent machine</p>
-            <h4>Persistent, multi-party identity</h4>
-            <p>Extend the existing SPIRE setup to register more than one workload, or issue durable certificates to disk, so credentials survive a gateway restart.</p>
-          </div>
-          <div class="stage-item">
-            <p class="why">Turns "hand-write the integration" into "import a package"</p>
-            <h4>A real client library</h4>
-            <p>The mTLS setup, request construction, and session-mapping glue that today gets hand-written per integration becomes a proper package.</p>
-          </div>
-          <div class="stage-item">
-            <p class="why">Removes the "edit Go, rebuild, redeploy" tax on every new agent</p>
-            <h4>Config-driven tool registry</h4>
-            <p>Onboarding a tool is still a source-code change today. Loading it from a file an operator can edit makes onboarding a repeatable, ownable process.</p>
-          </div>
-          <div class="stage-item">
-            <p class="why">Completes the property this whole system exists for</p>
-            <h4>Real injection detection</h4>
-            <p>The third signal in the trifecta &mdash; untrusted intent, not just untrusted source &mdash; gets a real detector and a policy rule that actually reads it.</p>
-          </div>
-          <div class="stage-item">
-            <p class="why">What "service" means once real actions are on the line</p>
-            <h4>Real egress and a durable audit chain</h4>
-            <p>An allow needs to do something real, and every decision needs to live somewhere tamper-evident, not just in a terminal's scrollback.</p>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div class="content-panel" id="content-p4" hidden style="--stat-color:var(--p4); --tag-color:var(--p4);">
@@ -1131,6 +1091,44 @@
         </div>
       </div>
     </div>
+
+    <div class="content-panel" id="content-p9" hidden style="--stat-color:var(--p9); --tag-color:var(--p9);">
+      <div>
+        <p class="skills-label">Next stage</p>
+        <div style="margin-top:10px;">
+          <div class="stage-item">
+            <p class="why">Foundation &mdash; everything below depends on this</p>
+            <h4>Wire cmd/gateway for real</h4>
+            <p>The actual entrypoint still just logs a line and exits. It needs a persistent identity, a real signed-bundle story, and a listener that stays up across restarts.</p>
+          </div>
+          <div class="stage-item">
+            <p class="why">Unblocks a second, independent machine</p>
+            <h4>Persistent, multi-party identity</h4>
+            <p>Extend the existing SPIRE setup to register more than one workload, or issue durable certificates to disk, so credentials survive a gateway restart.</p>
+          </div>
+          <div class="stage-item">
+            <p class="why">Turns "hand-write the integration" into "import a package"</p>
+            <h4>A real client library</h4>
+            <p>The mTLS setup, request construction, and session-mapping glue that today gets hand-written per integration becomes a proper package.</p>
+          </div>
+          <div class="stage-item">
+            <p class="why">Removes the "edit Go, rebuild, redeploy" tax on every new agent</p>
+            <h4>Config-driven tool registry</h4>
+            <p>Onboarding a tool is still a source-code change today. Loading it from a file an operator can edit makes onboarding a repeatable, ownable process.</p>
+          </div>
+          <div class="stage-item">
+            <p class="why">Completes the property this whole system exists for</p>
+            <h4>Real injection detection</h4>
+            <p>The third signal in the trifecta &mdash; untrusted intent, not just untrusted source &mdash; gets a real detector and a policy rule that actually reads it.</p>
+          </div>
+          <div class="stage-item">
+            <p class="why">What "service" means once real actions are on the line</p>
+            <h4>Real egress and a durable audit chain</h4>
+            <p>An allow needs to do something real, and every decision needs to live somewhere tamper-evident, not just in a terminal's scrollback.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1142,7 +1140,7 @@
       p7:'Aegis', p8:"Jishnu's Contribution", p9:'Next Stages'
     };
     var COLORS = {p4:'var(--p4)',p5:'var(--p5)',p6:'var(--p6)',p7:'var(--p7)',p8:'var(--p8)',p9:'var(--p9)'};
-    var CONTENT_IDS = {p7:'content-p7'};
+    var CONTENT_IDS = {p7:'content-p7', p4:'constellation-p4', p9:'content-p9'};
     var current = 0;
 
     var detail = document.getElementById('detail');
@@ -1179,6 +1177,7 @@
       } else {
         pendingPanel.hidden = false;
       }
+      if (m === 'p4'){ resetConstellation(); }
     }
 
     var conView = document.getElementById('conView');
