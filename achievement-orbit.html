@@ -837,9 +837,75 @@
         <button class="star-back" data-back>&#9668; CONSTELLATION</button>
         <div class="content-panel" style="--stat-color:var(--p5); --tag-color:var(--p5);">
           <div>
+            <p class="skills-label">Moving from a config file to a database</p>
             <p class="proj-title">Tool Registry</p>
-            <p class="lede">Details coming soon.</p>
+            <p class="lede">The tool registry is the gateway's record of what each tool actually does from a security standpoint &mdash; where its call goes, what action it represents, and what sensitivity label its result carries. The gateway looks up this data for every tool call instead of trusting the agent's own claim about it. It's necessary because without it, the system would have no independent source of truth to check a tool call against.</p>
           </div>
+
+          <div>
+            <p class="skills-label">Where it stands today</p>
+            <ul class="proj-list">
+              <li>Started as a hardcoded Go map, built directly in source &mdash; registering a tool meant a code change and a rebuild.</li>
+              <li>That file-based approach still has real limits: no safe way for two people to edit it at once, no access control beyond who can reach the file, one exposed file leaks the entire registry at once, and no history of what it used to say.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">What's changing</p>
+            <ul class="proj-list">
+              <li>Registering a tool becomes a Postgres table entry, edited through a proper CRUD API instead of a hand-edited file.</li>
+              <li>Same exact fields, same taxonomy, same way proxy gateway uses the result &mdash; this is a storage and editing upgrade, not a redesign of the security model.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">The schema &mdash; field by field</p>
+            <div class="table-wrap">
+              <table class="proj-table">
+                <thead><tr><th>Field</th><th>Type / values</th><th>Why it exists</th></tr></thead>
+                <tbody>
+                  <tr><td>name</td><td>text, primary key</td><td>The tool's identity.</td></tr>
+                  <tr><td>sink</td><td>internal / external / agent:&lt;id&gt;</td><td>Where the call is headed.</td></tr>
+                  <tr><td>capability</td><td>dotted tag, e.g. data.read</td><td>What the tool does.</td></tr>
+                  <tr><td>data_classes</td><td>array, e.g. [PRIVATE]</td><td>How sensitive the tool's result is.</td></tr>
+                  <tr><td>confidentiality</td><td>text, currently unused</td><td>A planned sensitivity level for the tool itself; reserved for later, not read by any rule yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <p class="skills-label">Why this way</p>
+            <ul class="proj-list">
+              <li>Concurrent-safe edits &mdash; multiple people can update the registry at once without corrupting a shared file.</li>
+              <li>No single point of failure &mdash; a leaked or corrupted file no longer exposes or breaks the entire registry at once.</li>
+              <li>A foundation for tracking change history, once that's built on top of the table.</li>
+              <li>No added latency &mdash; the live decision path never touches the database, so lookups stay sub-millisecond.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">How it stays fast</p>
+            <div style="margin-top:6px;">
+              <div class="status-row">
+                <span class="status-num">00</span>
+                <div class="status-body"><h4>Write</h4><p>An admin makes a change through the CRUD API &mdash; written to Postgres, the durable source of truth.</p></div>
+              </div>
+              <div class="status-row">
+                <span class="status-num">01</span>
+                <div class="status-body"><h4>Cache</h4><p>A background job periodically refreshes a cached copy in Redis, and from there rebuilds an in-memory copy inside the gateway process itself.</p></div>
+              </div>
+              <div class="status-row">
+                <span class="status-num">02</span>
+                <div class="status-body"><h4>Read</h4><p>Proxy gateway keeps reading that in-memory copy exactly as it does today, via <code>Registry.Lookup</code> &mdash; nothing about the live decision path changes.</p></div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <p class="lede">If Redis or Postgres has a bad moment, the gateway keeps serving off the last-known-good in-memory copy, and only refuses to start if there's no valid data at all &mdash; the same behavior as today's missing-file case.</p>
+          </div>
+
         </div>
       </div>
 
@@ -847,9 +913,74 @@
         <button class="star-back" data-back>&#9668; CONSTELLATION</button>
         <div class="content-panel" style="--stat-color:var(--p6); --tag-color:var(--p6);">
           <div>
+            <p class="skills-label">Moving from a config file to a database</p>
             <p class="proj-title">Agent Registry</p>
-            <p class="lede">Details coming soon.</p>
+            <p class="lede">Which agent can use which capability currently lives in one hardcoded block inside <code>policy-engine/policy/data/data.json</code>. Same move as the tool registry: into a database, behind a CRUD API.</p>
           </div>
+
+          <div>
+            <p class="skills-label">Where it stands today</p>
+            <ul class="proj-list">
+              <li>One scopes entry per agent, hand-edited directly inside a JSON file OPA reads.</li>
+              <li>No CRUD API, no demo folder, no dedicated doc &mdash; unlike the tool registry, this side has none of that yet.</li>
+              <li>Same limits as the old tool-registry file: no concurrent-safe edits, no access control, one exposed file leaks every agent's grants at once, no history of who changed what.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">What's changing</p>
+            <ul class="proj-list">
+              <li><code>data.json</code>'s scopes block becomes a Postgres table, <code>agent_scopes</code>, edited through a CRUD API.</li>
+              <li>Same fields, same meaning &mdash; this replaces the storage and editing, not the authorization logic.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">The schema</p>
+            <div class="table-wrap">
+              <table class="proj-table">
+                <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+                <tbody>
+                  <tr><td>agent_id</td><td>The verified SPIFFE ID.</td></tr>
+                  <tr><td>allowed_capabilities</td><td>List of capability tags this agent is permitted to use.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <p class="skills-label">Why this way</p>
+            <ul class="proj-list">
+              <li>Concurrent-safe edits &mdash; multiple people can update grants at once without corrupting a shared file.</li>
+              <li>Access control enforced at the API layer, instead of at the file system.</li>
+              <li>No single point of failure &mdash; a leaked file no longer exposes every agent's access at once.</li>
+              <li>A real place to keep a history of grants and revocations &mdash; matters more here than on the tool side, since this data decides who's allowed to do what.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">How it reaches OPA &mdash; the one part different from the tool registry</p>
+            <p class="lede">Tool data feeds plain Go code. This data has to reach OPA itself, since <code>authz.rego</code> reads it directly.</p>
+            <div style="margin-top:10px;">
+              <div class="status-row">
+                <span class="status-num">00</span>
+                <div class="status-body"><h4>Write</h4><p>A grant or revoke goes through the CRUD API into Postgres.</p></div>
+              </div>
+              <div class="status-row">
+                <span class="status-num">01</span>
+                <div class="status-body"><h4>Cache</h4><p>A background job refreshes a cached copy in Redis.</p></div>
+              </div>
+              <div class="status-row">
+                <span class="status-num">02</span>
+                <div class="status-body"><h4>Convert</h4><p>Converted to JSON, one agent at a time.</p></div>
+              </div>
+              <div class="status-row">
+                <span class="status-num">03</span>
+                <div class="status-body"><h4>Patch</h4><p>Patched into OPA's already-loaded data.</p></div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -857,8 +988,52 @@
         <button class="star-back" data-back>&#9668; CONSTELLATION</button>
         <div class="content-panel" style="--stat-color:var(--p7); --tag-color:var(--p7);">
           <div>
+            <p class="skills-label">Postgres, Redis, Sentinel</p>
             <p class="proj-title">Database Decision</p>
-            <p class="lede">Details coming soon.</p>
+            <p class="lede">Why three layers, not one: every tool call has to be decided in well under a millisecond, and can never depend on a live network call succeeding. That rules out querying a database directly during a decision. So the data has to live in three places, each doing a different job: a permanent home (Postgres), a fast shared copy (Redis), and an in-memory copy inside the actual decision-making process &mdash; the only one a live decision ever reads from.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Why Postgres &mdash; the persistent store</p>
+            <ul class="proj-list">
+              <li>Real transactions and strong consistency by default &mdash; matters because this is security-relevant data; two reads should never disagree about who's allowed what.</li>
+              <li>Our data is flat, well-structured rows (a tool's fields, an agent's capability list) &mdash; exactly what a relational table is built for, no need for a document store's flexibility.</li>
+              <li>Mature, proven, widely supported &mdash; nothing about our scale (tools in the hundreds/thousands, even agents in the millions) needs anything more exotic.</li>
+            </ul>
+            <p class="lede" style="margin-top:10px;">Why not the alternatives: ScyllaDB earns its complexity at massive scale with simple key lookups &mdash; we don't need that yet, and it costs us joins/transactions to get it. MongoDB fits document-shaped, variable data &mdash; ours isn't. A flat file (what we had before) can't be edited safely by more than one person, has no access control, and leaks everything at once if exposed.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Why Redis &mdash; the fast cache</p>
+            <ul class="proj-list">
+              <li>Purpose-built to hold a fast, shared, in-memory copy in front of a slower database &mdash; keeps the background refresh cheap instead of hitting Postgres directly every time.</li>
+              <li>Supports structured data (hashes with named fields) matching our actual records, not just flat key-value blobs.</li>
+              <li>Standard, well-supported choice for this exact role &mdash; nothing here needs a custom-built alternative.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">Why Sentinel &mdash; making Redis itself resilient</p>
+            <ul class="proj-list">
+              <li>Redis by itself is a single server &mdash; if it goes down, the background refresh stalls until someone restarts it.</li>
+              <li>Sentinel runs a primary Redis plus backup replicas, and automatically promotes a replica to primary the moment the current one stops responding &mdash; no manual intervention.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">The in-memory layer &mdash; why Go code, why JSON</p>
+            <p class="lede">A live decision can never depend on a network call &mdash; not to Postgres, not to Redis. So whatever the decision reads has to already be sitting inside the same running process, in plain memory, before the request even arrives.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Why plain Go code for the tool registry side</p>
+            <p class="lede">Proxy gateway is already Go code, so the tool registry's job is just to hand it a native Go map. Once Redis's data is parsed into that map &mdash; a one-time step, done in the background &mdash; every lookup after that is just reading a variable, nothing to parse or convert. It's the simplest possible choice here, because the reader and the writer are the same program.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Why JSON for the agent-capability side &mdash; and why that one's different</p>
+            <p class="lede">OPA isn't our own code &mdash; it's an external tool with its own rules, and its only interface for being handed data is a JSON-shaped document, which isn't our design choice but how OPA is built. Data is patched in one agent at a time rather than a full reload, because converting and reloading everyone's data over a single agent's grant change doesn't scale &mdash; cost should track what changed, not how much total data exists.</p>
+            <p class="lede" style="margin-top:10px;">Nuance: JSON is only the shape it arrives in. The moment it's handed to OPA, OPA parses it once into its own internal representation &mdash; it doesn't re-read raw JSON text on every evaluation, same "convert once, read many times" principle as the Go map.</p>
           </div>
         </div>
       </div>
