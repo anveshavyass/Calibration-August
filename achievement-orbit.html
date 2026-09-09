@@ -1115,14 +1115,80 @@
           </div>
 
           <div>
-            <p class="skills-label">How the cryptography works</p>
-            <div style="margin-top:6px;">
-              <div class="status-row"><span class="status-num">00</span><div class="status-body"><h4>Asymmetric keys</h4><p>Each workload holds a private key and a matching public key. Anything signed by the private key verifies against the public one &mdash; but the private key never leaves the workload.</p></div></div>
-              <div class="status-row"><span class="status-num">01</span><div class="status-body"><h4>X.509 certificate</h4><p>The public key wrapped with an identity and signed by a trusted authority. It asserts: this authority vouches that this key belongs to this identity.</p></div></div>
-              <div class="status-row"><span class="status-num">02</span><div class="status-body"><h4>Trust bundle</h4><p>The set of authorities we're willing to believe. A certificate only counts if it chains back to one of them &mdash; this is what makes an identity impossible to self-declare.</p></div></div>
-              <div class="status-row"><span class="status-num">03</span><div class="status-body"><h4>mTLS handshake</h4><p><b>Mutual</b> TLS: both sides present certificates and each proves it holds the matching private key. The gateway ends the handshake already knowing, cryptographically, who it is talking to.</p></div></div>
-              <div class="status-row"><span class="status-num">04</span><div class="status-body"><h4>SVID + URI SAN</h4><p>The agent's certificate is a <b>SPIFFE SVID</b> &mdash; short-lived, auto-rotated, carrying a SPIFFE ID such as <code>spiffe://aegis/agent-banking</code> in its URI SAN field. That ID <i>is</i> the agent's verified name.</p></div></div>
+            <p class="skills-label">The mTLS handshake, at a glance</p>
+            <div style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 14px 14px;margin-top:4px;">
+              <svg viewBox="0 0 640 392" style="width:100%;height:auto;display:block;" role="img" aria-label="Sequence: the agent presents its SVID, the gateway presents its certificate, each proves it holds its private key, the gateway checks the agent's certificate chains to a trusted CA and reads the SPIFFE ID from the URI SAN. Identity is established as spiffe://aegis/agent-analyst. An impostor whose certificate is not signed by a trusted CA is rejected at the handshake before any gate runs.">
+                <defs>
+                  <marker id="ah-id" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto-start-reverse"><path d="M0,0 L6,3 L0,6 Z" class="ah"/></marker>
+                </defs>
+                <style>
+                  #constellation-p8 svg text{font-family:var(--font-mono);}
+                  #constellation-p8 svg .hd{font-weight:700;fill:var(--ink);font-size:13px;}
+                  #constellation-p8 svg .sub{fill:var(--ink-dim);font-size:10px;}
+                  #constellation-p8 svg .lbl{fill:var(--ink);font-size:11px;}
+                  #constellation-p8 svg .mut{fill:var(--ink-dim);font-size:9.5px;letter-spacing:.06em;}
+                  #constellation-p8 svg .ok{fill:var(--p5);font-size:12.5px;font-weight:600;}
+                  #constellation-p8 svg .bad{fill:var(--p6);font-size:11px;font-weight:600;}
+                  #constellation-p8 svg .life{stroke:var(--line);stroke-width:1;stroke-dasharray:3 4;}
+                  #constellation-p8 svg .node{fill:var(--void);stroke:var(--p8);stroke-width:1.4;}
+                  #constellation-p8 svg .arrow{stroke:var(--p8);stroke-width:1.5;fill:none;}
+                  #constellation-p8 svg .gbox{fill:rgba(62,143,196,.08);stroke:var(--p8);stroke-width:1.1;}
+                  #constellation-p8 svg .okbox{fill:rgba(79,158,110,.14);stroke:var(--p5);stroke-width:1.3;}
+                  #constellation-p8 svg .badbox{fill:rgba(217,125,140,.10);stroke:var(--p6);stroke-width:1.1;stroke-dasharray:5 3;}
+                  #constellation-p8 svg .ah{fill:var(--p8);}
+                </style>
+
+                <!-- actor boxes -->
+                <rect class="node" x="30" y="22" width="180" height="46" rx="8"></rect>
+                <text class="hd" x="120" y="44" text-anchor="middle">AGENT</text>
+                <text class="sub" x="120" y="60" text-anchor="middle">holds private key + SVID</text>
+                <rect class="node" x="430" y="22" width="180" height="46" rx="8"></rect>
+                <text class="hd" x="520" y="44" text-anchor="middle">GATEWAY</text>
+                <text class="sub" x="520" y="60" text-anchor="middle">holds the trust bundle</text>
+
+                <!-- lifelines -->
+                <line class="life" x1="120" y1="68" x2="120" y2="204"></line>
+                <line class="life" x1="520" y1="68" x2="520" y2="210"></line>
+
+                <!-- step 1 -->
+                <text class="lbl" x="128" y="92">&#9312; presents its SVID &#160;(cert: key + spiffe://&#8230;)</text>
+                <line class="arrow" x1="122" y1="104" x2="516" y2="104" marker-end="url(#ah-id)"></line>
+
+                <!-- step 2 -->
+                <text class="lbl" x="128" y="132">&#9313; gateway presents its certificate</text>
+                <line class="arrow" x1="518" y1="144" x2="124" y2="144" marker-end="url(#ah-id)"></line>
+
+                <!-- step 3 -->
+                <text class="lbl" x="320" y="172" text-anchor="middle">&#9314; each proves it holds its private key</text>
+                <line class="arrow" x1="122" y1="184" x2="518" y2="184" marker-start="url(#ah-id)" marker-end="url(#ah-id)"></line>
+
+                <!-- gateway verifies -->
+                <line class="arrow" x1="520" y1="204" x2="520" y2="214"></line>
+                <rect class="gbox" x="300" y="214" width="326" height="62" rx="8"></rect>
+                <text class="mut" x="316" y="233">GATEWAY THEN VERIFIES</text>
+                <text class="lbl" x="316" y="252">&#9315; certificate chains to a trusted CA &#160;&#10003;</text>
+                <text class="lbl" x="316" y="269">&#9316; reads the identity from the URI SAN</text>
+
+                <!-- result -->
+                <rect class="okbox" x="30" y="290" width="580" height="38" rx="8"></rect>
+                <text class="ok" x="320" y="314" text-anchor="middle">&#10003;&#160; identity established &#160;=&#160; spiffe://aegis/agent-analyst</text>
+
+                <!-- impostor -->
+                <rect class="badbox" x="30" y="340" width="580" height="44" rx="8"></rect>
+                <text class="bad" x="48" y="360">&#10007;&#160; impostor &#8212; certificate not signed by a trusted CA</text>
+                <text class="bad" x="48" y="376">&#8594; rejected at the handshake, before any gate runs &#8212; no identity</text>
+              </svg>
             </div>
+          </div>
+
+          <div>
+            <p class="skills-label">The four primitives</p>
+            <ul class="proj-list">
+              <li><b>Asymmetric keys</b> &mdash; sign with the private key, verify with the public one; the private key never leaves the workload.</li>
+              <li><b>X.509 certificate</b> &mdash; a public key bound to an identity, signed by a trusted authority.</li>
+              <li><b>Trust bundle</b> &mdash; the authorities we accept; a certificate counts only if it chains back to one.</li>
+              <li><b>SVID + URI SAN</b> &mdash; a short-lived, auto-rotated cert carrying <code>spiffe://aegis/agent-banking</code> as the verified name.</li>
+            </ul>
           </div>
 
           <div class="callout-box" style="--tag-color:var(--p8);">
