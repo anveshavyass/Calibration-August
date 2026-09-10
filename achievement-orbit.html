@@ -1392,6 +1392,144 @@
 
     </div>
 
+    <div class="constellation-wrap" id="constellation-p6" hidden>
+
+      <div class="constellation-intro">
+        <p class="lede">A decision is only as good as the state it's judged against. This is the mechanism that makes Aegis's taint labels survive a restart, a crash, or a failover &mdash; and the one rule underneath all of it: absence is never treated as clean.</p>
+      </div>
+
+      <div class="constellation-view" id="conView6">
+        <div class="constellation-stage">
+          <div class="filler-stars"></div>
+          <svg class="constellation-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <line x1="15" y1="70" x2="50" y2="30"></line>
+            <line x1="50" y1="30" x2="85" y2="70"></line>
+          </svg>
+          <button class="con-star" style="left:15%; top:70%;" data-star="policyengine">
+            <span class="dot"></span><span class="lbl">Policy engine</span>
+          </button>
+          <button class="con-star" style="left:50%; top:30%;" data-star="redisstore">
+            <span class="dot"></span><span class="lbl">Store design &amp; Redis</span>
+          </button>
+          <button class="con-star" style="left:85%; top:70%;" data-star="postgresaudit">
+            <span class="dot"></span><span class="lbl">Postgres audit tier</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STAR 1: POLICY ENGINE -->
+      <div class="star-panel" id="star-policyengine" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p1); --tag-color:var(--p1);">
+          <div>
+            <p class="skills-label">Closing the lethal trifecta, for real</p>
+            <p class="proj-title">Policy Engine &mdash; Decision Points 4 &amp; 5</p>
+            <p class="lede">A malicious <code>send_money</code> call and a legitimate one are identical in every field except the destination. The only discriminating fact available is <b>where that value came from</b> &mdash; so this tracks trusted origins from content the gateway already knows is user-supplied, and checks any declared destination argument against that set before it clears.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">A bug I found before it shipped</p>
+            <p class="lede">The first version also admitted origins from tool arguments &mdash; which is circular: the same arguments get checked against the same set, so every destination silently certified itself. Fixed by restricting admission to content only, since arguments are what the agent chose, and the agent is exactly the component a prompt injection has already compromised.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">A second gate: consequence, not just taint</p>
+            <ul class="proj-list">
+              <li>Decision point 5 holds a request for human approval when it's <b>consequential</b>, <b>tainted</b>, and every other check has already cleared &mdash; never softening a real denial into a request for approval.</li>
+              <li>Threaded through OPA's existing contract without breaking any of the 11 pre-existing Rego tests, using Rego's own "undefined is not false" semantics for backward compatibility.</li>
+            </ul>
+          </div>
+
+          <div class="callout-box" style="--tag-color:var(--p1);">
+            <p><b>Verified with mutation testing, not just unit tests &mdash; six deliberate breaks, six caught.</b></p>
+          </div>
+
+          <div>
+            <p class="skills-label">What I learned</p>
+            <div class="skill-tags">
+              <span class="skill-tag" style="--tag-color:var(--p1);">Argument provenance</span>
+              <span class="skill-tag" style="--tag-color:var(--p1);">Rego semantics</span>
+              <span class="skill-tag" style="--tag-color:var(--p1);">Mutation testing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAR 2: STORE DESIGN & REDIS -->
+      <div class="star-panel" id="star-redisstore" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p8); --tag-color:var(--p8);">
+          <div>
+            <p class="skills-label">DEC-6 &middot; accepted 2026-09-09</p>
+            <p class="proj-title">Redis: Authoritative, Not a Cache</p>
+            <p class="lede">The obvious design &mdash; Redis as a fast cache in front of a durable Postgres &mdash; was planned, then rejected. Taint only ever accumulates, so a store that's fallen behind is always <i>missing</i> labels, never carrying extra ones. A lagging fallback reads cleaner than the truth &mdash; which is precisely the failure this system exists to prevent.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">The shipped design</p>
+            <ul class="proj-list">
+              <li>Redis holds the current state <b>and</b> the durable event log &mdash; one atomic Lua script merges both, so there's no instant where the hash has moved and the log hasn't.</li>
+              <li>Three answers on read, not two: known state, definitively never-created, or store-unavailable. An error is never treated as a miss &mdash; a timeout denies egress, it never waves it through.</li>
+              <li>A startup gate refuses to boot unless Redis is verifiably configured for <code>appendfsync always</code> &mdash; checked, not assumed, since the binary ships into environments we can't inspect.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">The ordering guarantee, not a timing one</p>
+            <p class="lede">A tool's result is held until its label is durably flushed &mdash; release happens strictly after the fence, never before. What's on disk in Redis is always a superset of what the agent has actually seen, by construction, not by how fast the write happens to be.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">What I learned</p>
+            <div class="skill-tags">
+              <span class="skill-tag" style="--tag-color:var(--p8);">Atomic Lua scripting</span>
+              <span class="skill-tag" style="--tag-color:var(--p8);">Fail-closed storage design</span>
+              <span class="skill-tag" style="--tag-color:var(--p8);">Ordering over timing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAR 3: POSTGRES AUDIT TIER -->
+      <div class="star-panel" id="star-postgresaudit" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p7); --tag-color:var(--p7);">
+          <div>
+            <p class="skills-label">Built &middot; never on the decision path</p>
+            <p class="proj-title">Postgres: Audit, Not Authority</p>
+            <p class="lede">Redis carries the durability guarantee entirely on its own &mdash; Postgres holds no responsibility for it. A drain worker reads Redis's event stream through a consumer group and writes rows for audit, reporting, and long retention, entirely off the request path.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">A real bug the drain surfaced</p>
+            <p class="lede">Built and ran the actual drain rather than only reviewing the Lua script &mdash; found that a commit which only admitted a new trusted origin (nothing else changing) never triggered the stream append at all. The event was real audit history and was being silently dropped. Fixed, and pinned with a regression test.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">What's still ahead</p>
+            <ul class="proj-list">
+              <li>Query and reporting surfaces over the audit tables &mdash; the data is being captured correctly today, but there's no dashboard or export tooling yet.</li>
+              <li>Long-retention/archival policy for the event log, once real volume makes that a live question rather than a hypothetical one.</li>
+            </ul>
+          </div>
+
+          <div class="callout-box" style="--tag-color:var(--p7);">
+            <p><b>If Postgres is down, decisions keep being made. Audit ingest delays; nothing about enforcement changes.</b></p>
+          </div>
+
+          <div>
+            <p class="skills-label">What I learned</p>
+            <div class="skill-tags">
+              <span class="skill-tag" style="--tag-color:var(--p7);">Consumer-group delivery</span>
+              <span class="skill-tag" style="--tag-color:var(--p7);">Idempotent audit writes</span>
+              <span class="skill-tag" style="--tag-color:var(--p7);">Finding bugs by running, not reading</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
     <div class="constellation-wrap" id="constellation-p5" hidden>
 
       <div class="constellation-intro">
@@ -1762,7 +1900,7 @@
       p7:'Aegis', p8:"Jishnu's Contribution", p9:'Next Stages'
     };
     var COLORS = {p4:'var(--p4)',p5:'var(--p5)',p6:'var(--p6)',p7:'var(--p7)',p8:'var(--p8)',p9:'var(--p9)'};
-    var CONTENT_IDS = {p7:'content-p7', p8:'constellation-p8', p4:'constellation-p4', p5:'constellation-p5', p9:'content-p9'};
+    var CONTENT_IDS = {p7:'content-p7', p8:'constellation-p8', p4:'constellation-p4', p5:'constellation-p5', p6:'constellation-p6', p9:'content-p9'};
     var current = 0;
 
     var detail = document.getElementById('detail');
