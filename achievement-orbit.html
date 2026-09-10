@@ -292,6 +292,23 @@
     .sun-edge{left:-140px;width:260px;height:260px;}
   }
 
+  /* ================= ROCKET TRAVEL ================= */
+  .rocket{
+    position:fixed;
+    top:0; left:0;
+    z-index:600;
+    font-size:20px;
+    line-height:1;
+    pointer-events:none;
+    opacity:0;
+    transform:translate(-50%,-50%);
+    filter:drop-shadow(0 0 6px rgba(242,166,73,.7)) drop-shadow(0 0 14px rgba(242,166,73,.35));
+    will-change:left,top,transform,opacity;
+  }
+  @media (prefers-reduced-motion:reduce){
+    .rocket{display:none;}
+  }
+
   /* ================= DETAIL OVERLAY (unchanged pattern) ================= */
   .detail{position:fixed; inset:0; background:var(--void-edge); z-index:30; display:flex; flex-direction:column; padding:22px 40px 30px;}
   .detail[hidden]{display:none;}
@@ -612,6 +629,8 @@
 </div>
 
 <div class="month-recap">August Month Recap</div>
+
+<div class="rocket" id="rocket" aria-hidden="true">&#128640;</div>
 
 <div class="stage">
   <div class="sun-edge"></div>
@@ -1373,10 +1392,203 @@
 
     </div>
 
+    <div class="constellation-wrap" id="constellation-p5" hidden>
+
+      <div class="constellation-intro">
+        <p class="lede">Two threads this month: giving Aegis eyes on content (detectors) without ever letting them become the thing that decides &mdash; and giving it memory of what a session has touched (the labelling schema). One is proven at scale; the other was tested hard enough to find its own limits.</p>
+      </div>
+
+      <div class="constellation-view" id="conView5">
+        <div class="constellation-stage">
+          <div class="filler-stars"></div>
+          <svg class="constellation-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <line x1="6" y1="78" x2="26" y2="40"></line>
+            <line x1="26" y1="40" x2="50" y2="70"></line>
+            <line x1="50" y1="70" x2="72" y2="34"></line>
+            <line x1="72" y1="34" x2="92" y2="62"></line>
+          </svg>
+          <button class="con-star" style="left:6%; top:78%;" data-star="secrets">
+            <span class="dot"></span><span class="lbl">Secrets</span>
+          </button>
+          <button class="con-star" style="left:26%; top:40%;" data-star="presidio">
+            <span class="dot"></span><span class="lbl">Presidio</span>
+          </button>
+          <button class="con-star" style="left:50%; top:70%;" data-star="promptguard">
+            <span class="dot"></span><span class="lbl">PromptGuard</span>
+          </button>
+          <button class="con-star" style="left:72%; top:34%;" data-star="labelling">
+            <span class="dot"></span><span class="lbl">Labelling Schema</span>
+          </button>
+          <button class="con-star" style="left:92%; top:62%;" data-star="learnings5">
+            <span class="dot"></span><span class="lbl">Advisory, Not Authority</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STAR 1: SECRETS -->
+      <div class="star-panel" id="star-secrets" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p5); --tag-color:var(--p5);">
+          <div>
+            <p class="skills-label">Detector 1 &middot; content-shape matching</p>
+            <p class="proj-title">Secrets Detection</p>
+            <p class="lede">A real gitleaks ruleset &mdash; 221 rules, compiled once at startup &mdash; scanning content for anything shaped like a known credential: API keys, tokens, access secrets. Keyword-prefiltered so the hot path never pays for a regex it doesn't need.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">What it catches, honestly</p>
+            <ul class="proj-list">
+              <li>Structured, known-shape secrets &mdash; an OpenAI key, an AWS access key, a GitHub token &mdash; with real allowlist and entropy filtering, matching gitleaks' own semantics exactly.</li>
+              <li>Deliberately no invented severity score &mdash; a secret is either present or it isn't; gitleaks rules carry no real severity tier of their own, and manufacturing one would be exactly the kind of false confidence this project avoids everywhere else.</li>
+            </ul>
+          </div>
+
+          <div class="callout-box" style="--tag-color:var(--p5);">
+            <p><b>Real, tested, running &mdash; and advisory only. Finding a secret changes what gets logged, never what gets allowed.</b></p>
+          </div>
+
+          <div>
+            <p class="skills-label">What I learned</p>
+            <div class="skill-tags">
+              <span class="skill-tag" style="--tag-color:var(--p5);">Keyword prefiltering</span>
+              <span class="skill-tag" style="--tag-color:var(--p5);">Entropy filtering</span>
+              <span class="skill-tag" style="--tag-color:var(--p5);">Advisory-only design</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAR 2: PRESIDIO -->
+      <div class="star-panel" id="star-presidio" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p2); --tag-color:var(--p2);">
+          <div>
+            <p class="skills-label">Detector 2 &middot; structured PII</p>
+            <p class="proj-title">Presidio (Go Port)</p>
+            <p class="lede">Microsoft Presidio's deterministic core, ported to Go with no NLP dependency: 12 entity types, each validated by a real checksum or structural rule &mdash; Luhn for credit cards, SSA rules for SSNs, mod-97 for IBANs, base58/Bech32 for crypto addresses.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">The line I drew, and why</p>
+            <ul class="proj-list">
+              <li>Only entities whose validity is <i>self-contained</i> made the cut &mdash; a checksum, or a rule baked entirely into the regex. Nothing needing spaCy's NLP models, an external lookup (phonenumbers, tldextract), or context-word confidence boosting.</li>
+              <li>That's a deliberate boundary, not a shortcut: names, addresses, and free-text PII need real language understanding, not a stronger regex &mdash; a different class of tool entirely.</li>
+            </ul>
+          </div>
+
+          <div>
+            <p class="skills-label">Where the month's testing actually pointed</p>
+            <p class="lede">Benchmarked candidate models to close that exact gap &mdash; zero-shot NER (GLiNER) against a fixed-category model (dslim/BERT), scored on the same CoNLL-2003 ground truth so neither side wins on a home-turf technicality. GLiNER's flexibility (define any label at inference time, no retraining) is the right fit for a gateway serving clients with different PII needs.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">What I learned</p>
+            <div class="skill-tags">
+              <span class="skill-tag" style="--tag-color:var(--p2);">Checksum validation</span>
+              <span class="skill-tag" style="--tag-color:var(--p2);">Principled scope-cutting</span>
+              <span class="skill-tag" style="--tag-color:var(--p2);">Zero-shot NER</span>
+              <span class="skill-tag" style="--tag-color:var(--p2);">Fair benchmarking</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAR 3: PROMPTGUARD -->
+      <div class="star-panel" id="star-promptguard" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--sun); --tag-color:var(--sun);">
+          <div>
+            <p class="skills-label">Detector 3 &middot; reasoning about intent, not just shape</p>
+            <p class="proj-title">PromptGuard 2</p>
+            <p class="lede">Meta's 86M-param injection/jailbreak classifier, converted to ONNX myself rather than trusting a third-party export, verified correct against the original PyTorch output. The plan: run it inline, alongside the regex detectors, as the one signal that reasons about intent rather than pattern.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">The test that mattered most this month</p>
+            <p class="lede">Ran it against Gandalf &mdash; 36,000+ real, human-crafted adversarial attempts, not a synthetic benchmark. Result: <b>100% catch rate</b> on override-style attacks (its actual design target) but <b>0% catch rate</b> on plain-question social engineering, despite that style succeeding 96.7% of the time in practice.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Why, precisely &mdash; not a bug, a ceiling</p>
+            <ul class="proj-list">
+              <li>A follow-up test showed the model reacts to <i>instruction-shaped phrasing itself</i> &mdash; including a legitimate system prompt &mdash; not to who's actually speaking. Content classifiers can't structurally distinguish trusted instruction from injected instruction; both are just text.</li>
+              <li>This isn't unique to PromptGuard &mdash; it's the same wall CaMeL and FIDES (Google DeepMind, and the FIDES team) independently identified: the distinction lives in provenance, not content.</li>
+            </ul>
+          </div>
+
+          <div class="callout-box" style="--tag-color:var(--sun);">
+            <p><b>Still open: the Go integration itself (tokenizer verified in Go; ONNX runtime binding is next), and where a context-blind signal should honestly sit in the decision path.</b></p>
+          </div>
+
+          <div>
+            <p class="skills-label">What I learned</p>
+            <div class="skill-tags">
+              <span class="skill-tag" style="--tag-color:var(--sun);">ONNX conversion</span>
+              <span class="skill-tag" style="--tag-color:var(--sun);">Adversarial evaluation</span>
+              <span class="skill-tag" style="--tag-color:var(--sun);">Structural vs. training limitations</span>
+              <span class="skill-tag" style="--tag-color:var(--sun);">Provenance over content</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAR 4: LABELLING SCHEMA -->
+      <div class="star-panel" id="star-labelling" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p4); --tag-color:var(--p4);">
+          <div>
+            <p class="skills-label">A session's memory of what it's touched</p>
+            <p class="proj-title">Labelling Schema</p>
+            <p class="lede">A two-axis trust model carried on every session: <b>Integrity</b> (trusted/untrusted, only ever moves toward untrusted) and <b>Confidentiality</b> (PUBLIC &rarr; CONFIDENTIAL, only ever moves toward more sensitive). Worst-wins combining on both axes &mdash; a session can never be made to look safer than the least-safe thing it's touched.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">Proven against real attack data</p>
+            <ul class="proj-list">
+              <li>706 real AgentDojo security cases, across real attack patterns: <b>609/609 attacks blocked, 97/97 benign actions allowed</b>, zero false positives, zero false negatives.</li>
+              <li>Flagged that result as <i>suspiciously</i> clean before trusting it &mdash; traced it to the test relying on the benchmark's own ground-truth sink label rather than one Aegis derived itself. Proves the enforcement logic is sound given correct labels; the harder problem &mdash; deriving those labels from raw content &mdash; stays honestly open.</li>
+            </ul>
+          </div>
+
+          <div class="callout-box" style="--tag-color:var(--p4);">
+            <p><b>Trust is a fact about where data came from. Never a judgment about what the data says.</b></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAR 5: LEARNINGS -->
+      <div class="star-panel" id="star-learnings5" hidden>
+        <button class="star-back" data-back>&#9668; CONSTELLATION</button>
+        <div class="content-panel" style="--stat-color:var(--p3); --tag-color:var(--p3);">
+          <div>
+            <p class="skills-label">The through-line</p>
+            <p class="proj-title">Advisory, Not Authority</p>
+            <p class="lede">Detectors answer "does this content look suspicious." Labelling answers "where did this come from, and what has this session already touched." Only one of those two questions can safely gate a decision &mdash; and this month's testing is the evidence for why.</p>
+          </div>
+
+          <div>
+            <p class="skills-label">What the month actually taught me</p>
+            <ul class="proj-list">
+              <li><b>Test the thing you built, not just the thing you intended.</b> A 100%-on-paper detector had a real, measurable blind spot the moment it met real adversarial data.</li>
+              <li><b>A clean result deserves more suspicion than a messy one.</b> 609/609 was worth investigating precisely because it was too perfect.</li>
+              <li><b>Some limitations are architectural, not fixable by trying harder.</b> No content classifier will ever reliably separate trusted instruction from injected instruction &mdash; that distinction only exists in provenance.</li>
+            </ul>
+          </div>
+
+          <p class="signoff">detectors watch &rarr; labels remember &rarr; only one of them decides.</p>
+        </div>
+      </div>
+
+    </div>
+
     <div class="content-panel" id="content-p7" hidden style="--stat-color:var(--p7); --tag-color:var(--p7);">
       <div>
         <p class="skills-label">Status report &mdash; AI Security Gateway</p>
         <p class="proj-title">Aegis</p>
+      </div>
+
+      <div>
+        <img src="flowchart.png" alt="Aegis request flow diagram" style="width:100%;height:auto;display:block;border-radius:8px;border:1px solid var(--line);">
       </div>
 
       <div>
@@ -1550,7 +1762,7 @@
       p7:'Aegis', p8:"Jishnu's Contribution", p9:'Next Stages'
     };
     var COLORS = {p4:'var(--p4)',p5:'var(--p5)',p6:'var(--p6)',p7:'var(--p7)',p8:'var(--p8)',p9:'var(--p9)'};
-    var CONTENT_IDS = {p7:'content-p7', p8:'constellation-p8', p4:'constellation-p4', p9:'content-p9'};
+    var CONTENT_IDS = {p7:'content-p7', p8:'constellation-p8', p4:'constellation-p4', p5:'constellation-p5', p9:'content-p9'};
     var current = 0;
 
     var detail = document.getElementById('detail');
@@ -1560,6 +1772,54 @@
     var pendingPanel = document.getElementById('pendingPanel');
     var pendingName = document.getElementById('pendingName');
     var dotsEl = document.getElementById('dots');
+
+    var rocket = document.getElementById('rocket');
+    var rocketBusy = false;
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function flyRocket(fromRect, toRect, duration, onArrive){
+      if (reduceMotion || !rocket){ onArrive(); return; }
+      var fx = fromRect.left + fromRect.width / 2, fy = fromRect.top + fromRect.height / 2;
+      var tx = toRect.left + toRect.width / 2, ty = toRect.top + toRect.height / 2;
+      var angle = Math.atan2(ty - fy, tx - fx) * 180 / Math.PI + 45;
+      rocket.style.transition = 'none';
+      rocket.style.left = fx + 'px';
+      rocket.style.top = fy + 'px';
+      rocket.style.transform = 'translate(-50%,-50%) rotate(' + angle + 'deg) scale(1)';
+      rocket.style.opacity = '1';
+      void rocket.offsetWidth;
+      rocket.style.transition = 'left ' + duration + 'ms cubic-bezier(.5,.05,.5,.95), top ' + duration + 'ms cubic-bezier(.5,.05,.5,.95), transform ' + duration + 'ms ease-in-out';
+      requestAnimationFrame(function(){
+        rocket.style.left = tx + 'px';
+        rocket.style.top = ty + 'px';
+        rocket.style.transform = 'translate(-50%,-50%) rotate(' + angle + 'deg) scale(.55)';
+      });
+      setTimeout(function(){
+        rocket.style.transition = 'opacity 200ms ease-out';
+        rocket.style.opacity = '0';
+        onArrive();
+      }, duration);
+    }
+
+    function visitPlanet(el, idx){
+      if (rocketBusy) return;
+      rocketBusy = true;
+      var sun = document.querySelector('.sun-edge');
+      var fromRect = sun ? sun.getBoundingClientRect() : el.getBoundingClientRect();
+      flyRocket(fromRect, el.getBoundingClientRect(), 650, function(){
+        rocketBusy = false;
+        open(idx);
+      });
+    }
+
+    function visitStar(stageEl, starEl, onArrive){
+      if (rocketBusy) return;
+      rocketBusy = true;
+      flyRocket(stageEl.getBoundingClientRect(), starEl.getBoundingClientRect(), 450, function(){
+        rocketBusy = false;
+        onArrive();
+      });
+    }
 
     MODULES.forEach(function(m, i){
       var d = document.createElement('button');
@@ -1608,7 +1868,9 @@
       }
       wrap._reset = reset;
       wrap.querySelectorAll('.con-star').forEach(function(s){
-        s.addEventListener('click', function(){ openStar(s.getAttribute('data-star')); });
+        s.addEventListener('click', function(){
+          visitStar(view.querySelector('.constellation-stage'), s, function(){ openStar(s.getAttribute('data-star')); });
+        });
       });
       wrap.querySelectorAll('[data-back]').forEach(function(b){
         b.addEventListener('click', reset);
@@ -1633,7 +1895,7 @@
     function step(delta){ current = (current + delta + MODULES.length) % MODULES.length; render(); }
 
     document.querySelectorAll('[data-module]').forEach(function(el){
-      el.addEventListener('click', function(){ open(MODULES.indexOf(el.getAttribute('data-module'))); });
+      el.addEventListener('click', function(){ visitPlanet(el, MODULES.indexOf(el.getAttribute('data-module'))); });
     });
     document.getElementById('backBtn').addEventListener('click', close);
     document.getElementById('prevBtn').addEventListener('click', function(){ step(-1); });
